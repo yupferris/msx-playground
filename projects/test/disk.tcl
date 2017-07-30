@@ -8,6 +8,7 @@ virtual_drive $diskname
 
 # import file(s)
 diskmanipulator import virtual_drive autoexec.bas
+diskmanipulator import virtual_drive test.bin
 
 # byee~
 exit
