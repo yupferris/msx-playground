@@ -12,8 +12,8 @@ all: $(DISK)
 $(DISK): autoexec.bas disk.tcl
 	openmsx -script disk.tcl
 
-test: $(DISK) ../scripts/test.tcl
-	openmsx -script ../scripts/test.tcl -machine $(MACHINE) -diska $(DISK)
+test: $(DISK) ../../scripts/test.tcl
+	openmsx -script ../../scripts/test.tcl -machine $(MACHINE) -diska $(DISK)
 
 clean:
 	$(RM) $(RMFLAGS) $(DISK)
