@@ -36,10 +36,18 @@ start_addr:
 entry:
     call write_msg
 
-main_loop:
-    ; TODO: I don't think this is actually working like I expect.. :D
+    ; Disable interrupts (otherwise our VDP I/O could get screwed due to internal index flip flops)
+    di
 
-    ; Set color number to zero
+main_loop:
+    ; Set bg/fg colors to color 0
+    ld c, $99
+    ld a, 0
+    out (c), a
+    ld a, $07 | $80
+    out (c), a
+
+    ; Set color number to zero (we'll overwrite this color)
     ld c, $99
     ld a, 0
     out (c), a
@@ -50,7 +58,6 @@ main_loop:
     ld c, $9a
     ld hl, color_value
     ld a, (hl)
-    and $0f
     out (c), a
     out (c), a
     inc (hl)
