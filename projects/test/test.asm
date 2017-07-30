@@ -37,12 +37,30 @@ entry:
     call write_msg
 
 main_loop:
+    ; TODO: I don't think this is actually working like I expect.. :D
+
+    ; Set color number to zero
+    ld c, $99
+    ld a, 0
+    out (c), a
+    ld a, $10 | $80
+    out (c), a
+
+    ; Output next color and increment color value
+    ld c, $9a
+    ld hl, color_value
+    ld a, (hl)
+    and $0f
+    out (c), a
+    out (c), a
+    inc (hl)
+
     jr main_loop
 
 write_msg:
     ld hl, msg
 write_msg_byte:
-    ld a,(hl)
+    ld a, (hl)
     or a
     ret z
     call CHPUT
@@ -52,5 +70,10 @@ write_msg_byte:
 msg:
     .asc "Hello, world!"
     .db $13, $10, $00
+
+    ; TODO: Proper RAM section for this? This should technically work just fine, but I'm not
+    ;  sure how well WLA handles mixed RAM/ROM or if there's a nicer way to do this.
+color_value:
+    .db $00
 
 end_addr:
