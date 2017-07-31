@@ -39,27 +39,24 @@ entry:
     ; Disable interrupts (otherwise our VDP I/O could get screwed due to internal index flip flops)
     di
 
-main_loop:
     ; Set bg/fg colors to color 0
-    ld c, $99
     ld a, 0
-    out (c), a
+    out ($99), a
     ld a, $07 | $80
-    out (c), a
+    out ($99), a
 
+main_loop:
     ; Set color number to zero (we'll overwrite this color)
-    ld c, $99
     ld a, 0
-    out (c), a
+    out ($99), a
     ld a, $10 | $80
-    out (c), a
+    out ($99), a
 
     ; Output next color and increment color value
-    ld c, $9a
     ld hl, color_value
     ld a, (hl)
-    out (c), a
-    out (c), a
+    out ($9a), a
+    out ($9a), a
     inc (hl)
 
     jr main_loop
