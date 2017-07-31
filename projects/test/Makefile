@@ -11,25 +11,27 @@ DISK=$(PROJECT).dsk
 
 MACHINE=sony_hb-f1xd
 
+MAKEFILE=Makefile
+
 RM=rm
 RMFLAGS=-f
 
 all: $(DISK)
 
-$(AUTOEXEC):
+$(AUTOEXEC): $(MAKEFILE)
 	# Note that this must contain only ASCII and if newlines are used, they must be \r\n
 	printf "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
 
 $(OBJ): $(SRC)
 	wla-z80 -o $(OBJ) $(SRC)
 
-$(LINK):
+$(LINK): $(MAKEFILE)
 	printf "[objects]\n$(OBJ)\n" > $(LINK)
 
 $(BIN): $(OBJ) $(LINK)
 	wlalink $(LINK) $(BIN)
 
-$(DISKSCRIPT):
+$(DISKSCRIPT): $(MAKEFILE)
 	# create disk
 	printf "diskmanipulator create $(DISK) 360k\n" > $(DISKSCRIPT)
 
