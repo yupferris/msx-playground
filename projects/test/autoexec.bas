@@ -1,1 +1,0 @@
-10 bload "test.bin",r
