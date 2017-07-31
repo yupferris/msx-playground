@@ -16,13 +16,13 @@ RMFLAGS=-f
 all: $(DISK)
 
 $(AUTOEXEC):
-	echo -en "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
+	printf "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
 
 $(OBJ): $(SRC)
 	wla-z80 -o $(OBJ) $(SRC)
 
 $(LINK):
-	echo -en "[objects]\n$(OBJ)\n" > $(LINK)
+	printf "[objects]\n$(OBJ)\n" > $(LINK)
 
 $(BIN): $(OBJ) $(LINK)
 	wlalink $(LINK) $(BIN)
