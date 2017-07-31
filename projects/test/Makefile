@@ -2,67 +2,68 @@ PROJECT=test
 
 SRC=$(PROJECT).asm
 
-BUILDDIR=build
+BUILD_DIR=build
 
-OBJ=$(BUILDDIR)/$(PROJECT).obj
-BIN=$(BUILDDIR)/$(PROJECT).bin
-LINKSCRIPT=$(BUILDDIR)/$(PROJECT).link
+OBJ=$(BUILD_DIR)/$(PROJECT).obj
+BIN_FILE_NAME=$(PROJECT).bin
+BIN=$(BUILD_DIR)/$(BIN_FILE_NAME)
+LINK_SCRIPT=$(BUILD_DIR)/$(PROJECT).link
 
-AUTOEXEC=$(BUILDDIR)/autoexec.bas
+AUTOEXEC=$(BUILD_DIR)/autoexec.bas
 
-DISKSCRIPT=$(BUILDDIR)/disk.tcl
-DISK=$(BUILDDIR)/$(PROJECT).dsk
+DISK_SCRIPT=$(BUILD_DIR)/disk.tcl
+DISK=$(BUILD_DIR)/$(PROJECT).dsk
 
-TESTSCRIPT=../../scripts/test.tcl
+TEST_SCRIPT=../../scripts/test.tcl
 
 MACHINE=sony_hb-f1xd
 
 MAKEFILE=Makefile
 
 RM=rm
-RMFLAGS=-rf
+RM_FLAGS=-rf
 
 .PHONY: dirs
 
 all: dirs $(DISK)
 
-dirs: $(BUILDDIR)
+dirs: $(BUILD_DIR)
 
-$(BUILDDIR):
-	mkdir -p $(BUILDDIR)
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 $(AUTOEXEC): $(MAKEFILE)
 	# Note that this must contain only ASCII and if newlines are used, they must be \r\n
-	printf "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
+	printf "10 bload\"$(BIN_FILE_NAME)\",r" > $(AUTOEXEC)
 
 $(OBJ): $(SRC)
 	wla-z80 -o $(OBJ) $(SRC)
 
-$(LINKSCRIPT): $(MAKEFILE)
-	printf "[objects]\n$(OBJ)\n" > $(LINKSCRIPT)
+$(LINK_SCRIPT): $(MAKEFILE)
+	printf "[objects]\n$(OBJ)\n" > $(LINK_SCRIPT)
 
-$(BIN): $(OBJ) $(LINKSCRIPT)
-	wlalink $(LINKSCRIPT) $(BIN)
+$(BIN): $(OBJ) $(LINK_SCRIPT)
+	wlalink $(LINK_SCRIPT) $(BIN)
 
-$(DISKSCRIPT): $(MAKEFILE)
+$(DISK_SCRIPT): $(MAKEFILE)
 	# create disk
-	printf "diskmanipulator create $(DISK) 360k\n" > $(DISKSCRIPT)
+	printf "diskmanipulator create $(DISK) 360k\n" > $(DISK_SCRIPT)
 
 	# load disk
-	printf "virtual_drive $(DISK)\n" >> $(DISKSCRIPT)
+	printf "virtual_drive $(DISK)\n" >> $(DISK_SCRIPT)
 
 	# import file(s)
-	printf "diskmanipulator import virtual_drive $(AUTOEXEC)\n" >> $(DISKSCRIPT)
-	printf "diskmanipulator import virtual_drive $(BIN)\n" >> $(DISKSCRIPT)
+	printf "diskmanipulator import virtual_drive $(AUTOEXEC)\n" >> $(DISK_SCRIPT)
+	printf "diskmanipulator import virtual_drive $(BIN)\n" >> $(DISK_SCRIPT)
 
 	# byee~
-	printf "exit\n" >> $(DISKSCRIPT)
+	printf "exit\n" >> $(DISK_SCRIPT)
 
-$(DISK): $(AUTOEXEC) $(BIN) $(DISKSCRIPT)
-	openmsx -script $(DISKSCRIPT)
+$(DISK): $(AUTOEXEC) $(BIN) $(DISK_SCRIPT)
+	openmsx -script $(DISK_SCRIPT)
 
-test: dirs $(DISK) $(TESTSCRIPT)
-	openmsx -script $(TESTSCRIPT) -machine $(MACHINE) -diska $(DISK)
+test: dirs $(DISK) $(TEST_SCRIPT)
+	openmsx -script $(TEST_SCRIPT) -machine $(MACHINE) -diska $(DISK)
 
 clean:
-	$(RM) $(RMFLAGS) $(BUILDDIR)
+	$(RM) $(RM_FLAGS) $(BUILD_DIR)
