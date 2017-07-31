@@ -1,5 +1,5 @@
 # msx-playground
-What is says on the tin :)
+What it says on the tin :)
 
 # description
 
