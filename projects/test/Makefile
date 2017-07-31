@@ -17,6 +17,7 @@ RMFLAGS=-f
 all: $(DISK)
 
 $(AUTOEXEC):
+	# Note that this must contain only ASCII and if newlines are used, they must be \r\n
 	printf "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
 
 $(OBJ): $(SRC)
