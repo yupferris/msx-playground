@@ -9,6 +9,8 @@ AUTOEXEC=autoexec.bas
 DISKSCRIPT=disk.tcl
 DISK=$(PROJECT).dsk
 
+TESTSCRIPT=../../scripts/test.tcl
+
 MACHINE=sony_hb-f1xd
 
 MAKEFILE=Makefile
@@ -48,8 +50,8 @@ $(DISKSCRIPT): $(MAKEFILE)
 $(DISK): $(AUTOEXEC) $(BIN) $(DISKSCRIPT)
 	openmsx -script $(DISKSCRIPT)
 
-test: $(DISK) ../../scripts/test.tcl
-	openmsx -script ../../scripts/test.tcl -machine $(MACHINE) -diska $(DISK)
+test: $(DISK) $(TESTSCRIPT)
+	openmsx -script $(TESTSCRIPT) -machine $(MACHINE) -diska $(DISK)
 
 clean:
 	$(RM) $(RMFLAGS) $(OBJ)
