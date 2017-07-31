@@ -1,4 +1,5 @@
-autoexec.bas
 *.obj
 test.bin
+test.link
+autoexec.bas
 test.dsk

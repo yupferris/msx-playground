@@ -16,12 +16,15 @@ RMFLAGS=-f
 all: $(DISK)
 
 $(AUTOEXEC):
-	echo -n "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
+	echo -en "10 bload\"$(BIN)\",r" > $(AUTOEXEC)
 
 $(OBJ): $(SRC)
 	wla-z80 -o $(OBJ) $(SRC)
 
-$(BIN): test.obj test.link
+$(LINK):
+	echo -en "[objects]\n$(OBJ)\n" > $(LINK)
+
+$(BIN): $(OBJ) $(LINK)
 	wlalink $(LINK) $(BIN)
 
 $(DISK): $(AUTOEXEC) $(BIN) disk.tcl
@@ -31,7 +34,8 @@ test: $(DISK) ../../scripts/test.tcl
 	openmsx -script ../../scripts/test.tcl -machine $(MACHINE) -diska $(DISK)
 
 clean:
-	$(RM) $(RMFLAGS) $(AUTOEXEC)
 	$(RM) $(RMFLAGS) $(OBJ)
 	$(RM) $(RMFLAGS) $(BIN)
+	$(RM) $(RMFLAGS) $(LINK)
+	$(RM) $(RMFLAGS) $(AUTOEXEC)
 	$(RM) $(RMFLAGS) $(DISK)
