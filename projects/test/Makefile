@@ -1,13 +1,17 @@
 PROJECT=test
+
 SRC=$(PROJECT).asm
-OBJ=$(PROJECT).obj
-BIN=$(PROJECT).bin
-LINK=$(PROJECT).link
 
-AUTOEXEC=autoexec.bas
+BUILDDIR=build
 
-DISKSCRIPT=disk.tcl
-DISK=$(PROJECT).dsk
+OBJ=$(BUILDDIR)/$(PROJECT).obj
+BIN=$(BUILDDIR)/$(PROJECT).bin
+LINKSCRIPT=$(BUILDDIR)/$(PROJECT).link
+
+AUTOEXEC=$(BUILDDIR)/autoexec.bas
+
+DISKSCRIPT=$(BUILDDIR)/disk.tcl
+DISK=$(BUILDDIR)/$(PROJECT).dsk
 
 TESTSCRIPT=../../scripts/test.tcl
 
@@ -16,9 +20,16 @@ MACHINE=sony_hb-f1xd
 MAKEFILE=Makefile
 
 RM=rm
-RMFLAGS=-f
+RMFLAGS=-rf
 
-all: $(DISK)
+.PHONY: dirs
+
+all: dirs $(DISK)
+
+dirs: $(BUILDDIR)
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
 $(AUTOEXEC): $(MAKEFILE)
 	# Note that this must contain only ASCII and if newlines are used, they must be \r\n
@@ -27,11 +38,11 @@ $(AUTOEXEC): $(MAKEFILE)
 $(OBJ): $(SRC)
 	wla-z80 -o $(OBJ) $(SRC)
 
-$(LINK): $(MAKEFILE)
-	printf "[objects]\n$(OBJ)\n" > $(LINK)
+$(LINKSCRIPT): $(MAKEFILE)
+	printf "[objects]\n$(OBJ)\n" > $(LINKSCRIPT)
 
-$(BIN): $(OBJ) $(LINK)
-	wlalink $(LINK) $(BIN)
+$(BIN): $(OBJ) $(LINKSCRIPT)
+	wlalink $(LINKSCRIPT) $(BIN)
 
 $(DISKSCRIPT): $(MAKEFILE)
 	# create disk
@@ -50,13 +61,8 @@ $(DISKSCRIPT): $(MAKEFILE)
 $(DISK): $(AUTOEXEC) $(BIN) $(DISKSCRIPT)
 	openmsx -script $(DISKSCRIPT)
 
-test: $(DISK) $(TESTSCRIPT)
+test: dirs $(DISK) $(TESTSCRIPT)
 	openmsx -script $(TESTSCRIPT) -machine $(MACHINE) -diska $(DISK)
 
 clean:
-	$(RM) $(RMFLAGS) $(OBJ)
-	$(RM) $(RMFLAGS) $(BIN)
-	$(RM) $(RMFLAGS) $(LINK)
-	$(RM) $(RMFLAGS) $(AUTOEXEC)
-	$(RM) $(RMFLAGS) $(DISKSCRIPT)
-	$(RM) $(RMFLAGS) $(DISK)
+	$(RM) $(RMFLAGS) $(BUILDDIR)
