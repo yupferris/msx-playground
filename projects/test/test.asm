@@ -39,12 +39,6 @@ entry:
     ; Disable interrupts (otherwise our VDP I/O could get screwed due to internal index flip flops)
     di
 
-    ; Turn screen off
-    ld a, $10
-    out ($99), a
-    ld a, $01 | $80
-    out ($99), a
-
     ; Set bg/fg colors to color 0
     ld a, 0
     out ($99), a
