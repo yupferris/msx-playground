@@ -2,11 +2,11 @@
 .asciitable
 .enda
 
-; Map each slot to the 4 swappable mem regions in the regular mem map
-;  Note that here we're talking WLA slots which are like mem windows, so they map pretty 1:1
-;  with 4 regions of the msx2 mem map. However this differs from what's usually referred to
-;  as slots when talking about msx memory, which are more like the banks that get swapped and
-;  are visible through wla slots.
+; Map each slot to the 4 mem pages in the msx2 mem map
+;  Note that here we're talking wla slots which are like mem windows, so they map pretty 1:1
+;  with 4 pages of the msx2 mem map. However this differs from what's usually referred to
+;  as slots when talking about msx memory, which are distinct groups of pages, much like
+;  groups of wla banks that get swapped, and portions of which are visible through wla slots.
 .memorymap
 defaultslot 2
 slotsize $4000
