@@ -5,11 +5,8 @@ SRC=$(PROJECT).asm
 BUILD_DIR=build
 
 OBJ=$(BUILD_DIR)/$(PROJECT).obj
-BIN_FILE_NAME=$(PROJECT).bin
-BIN=$(BUILD_DIR)/$(BIN_FILE_NAME)
+BIN=$(BUILD_DIR)/MSXDOS.SYS
 LINK_SCRIPT=$(BUILD_DIR)/$(PROJECT).link
-
-AUTOEXEC=$(BUILD_DIR)/autoexec.bas
 
 DISK_SCRIPT=$(BUILD_DIR)/disk.tcl
 DISK=$(BUILD_DIR)/$(PROJECT).dsk
@@ -32,10 +29,6 @@ dirs: $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(AUTOEXEC): $(MAKEFILE)
-	# Note that this must contain only ASCII and if newlines are used, they must be \r\n
-	printf "10 bload\"$(BIN_FILE_NAME)\",r" > $(AUTOEXEC)
-
 $(OBJ): $(SRC)
 	wla-z80 -o $(OBJ) $(SRC)
 
@@ -53,13 +46,12 @@ $(DISK_SCRIPT): $(MAKEFILE)
 	printf "virtual_drive $(DISK)\n" >> $(DISK_SCRIPT)
 
 	# import file(s)
-	printf "diskmanipulator import virtual_drive $(AUTOEXEC)\n" >> $(DISK_SCRIPT)
 	printf "diskmanipulator import virtual_drive $(BIN)\n" >> $(DISK_SCRIPT)
 
 	# byee~
 	printf "exit\n" >> $(DISK_SCRIPT)
 
-$(DISK): $(AUTOEXEC) $(BIN) $(DISK_SCRIPT)
+$(DISK): $(BIN) $(DISK_SCRIPT)
 	openmsx -script $(DISK_SCRIPT)
 
 test: dirs $(DISK) $(TEST_SCRIPT)
