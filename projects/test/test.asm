@@ -26,32 +26,68 @@ banks 1
 .define BDOS $f37d
 .define CONOUT $02
 .define STROUT $09
+.define FOPEN $0f
+.define FCLOSE $10
+.define SETDTA $1a
+.define RDBLK $27
+
+.define FCB $005c
 
 entry:
-    ; Write out messages (syscall test)
-    ld de, message1
-    ld c, STROUT
+    ; Load message from file
+    ;  Prepare unopened FCB
+    ld hl, FCB
+    ;   Drive number (0 = default)
+    ld a, 0
+    ld (hl), a
+    inc hl
+    ;   File name
+    ld de, message_file_name
+    ld b, 11
+load_message_file_name_loop:
+        ld a, (de)
+        ld (hl), a
+        inc de
+        inc hl
+    djnz load_message_file_name_loop
+
+    ;  Open file
+    ld de, FCB
+    ld c, FOPEN
     call BDOS
 
-    ld hl, message2
-message_2_char_loop:
-        ld a, (hl)
-        or a
-        jr z, message_2_char_loop_end
+    ;  Set DTA addr
+    ;   We'll use a random block read to read the whole file as one block, so we can just set this to our target addr
+    ld de, message
+    ld c, SETDTA
+    call BDOS
 
-        push hl
-        push af
+    ;  Set record size to file size
+    ;   Since we can safely assume the file is less than 64kb bytes in size, we can just copy out the low two bytes of the file size
+    ld hl, (FCB + 16)
+    ld (FCB + 14), hl
 
-        ld e, a
-        ld c, CONOUT
-        call BDOS
+    ;  Clear random record
+    ld hl, 0
+    ld (FCB + 33), hl
+    ld (FCB + 35), hl
 
-        pop af
-        pop hl
+    ;  Read record
+    ;   Here we read the entire message as one record
+    ld de, FCB
+    ld hl, 1
+    ld c, RDBLK
+    call BDOS
 
-        inc hl
-    jr message_2_char_loop
-message_2_char_loop_end:
+    ;  Close file
+    ld de, FCB
+    ld c, FCLOSE
+    call BDOS
+
+    ; Write out message
+    ld de, message
+    ld c, STROUT
+    call BDOS
 
     ; Disable interrupts (otherwise our VDP I/O could get screwed due to internal index flip flops)
     di
@@ -78,13 +114,11 @@ main_loop:
 
     jr main_loop
 
-message1:
-    .asc "hi gotaku birade ruls mmk"
-    .db $13, $10
-    .asc "$"
-message2:
-    .asc "hi its me again fam"
-    .db $00
+message_file_name:
+    ;     ***********
+    .asc "MESSAGE    "
 
 color_value:
     .db $00
+
+message: ; Will be read from file

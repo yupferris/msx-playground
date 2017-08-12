@@ -8,6 +8,8 @@ OBJ=$(BUILD_DIR)/$(PROJECT).obj
 BIN=$(BUILD_DIR)/MSXDOS.SYS
 LINK_SCRIPT=$(BUILD_DIR)/$(PROJECT).link
 
+MESSAGE=$(BUILD_DIR)/MESSAGE
+
 DISK_SCRIPT=$(BUILD_DIR)/disk.tcl
 DISK=$(BUILD_DIR)/$(PROJECT).dsk
 
@@ -38,6 +40,9 @@ $(LINK_SCRIPT): $(MAKEFILE)
 $(BIN): $(OBJ) $(LINK_SCRIPT)
 	wlalink $(LINK_SCRIPT) $(BIN)
 
+$(MESSAGE): $(MAKEFILE)
+	printf "hey it worked yey I can make this say whatever I want and it reads properly as a single record brotaku gagade$$" > $(MESSAGE)
+
 $(DISK_SCRIPT): $(MAKEFILE)
 	# create disk
 	printf "diskmanipulator create $(DISK) 360k\n" > $(DISK_SCRIPT)
@@ -47,11 +52,12 @@ $(DISK_SCRIPT): $(MAKEFILE)
 
 	# import file(s)
 	printf "diskmanipulator import virtual_drive $(BIN)\n" >> $(DISK_SCRIPT)
+	printf "diskmanipulator import virtual_drive $(MESSAGE)\n" >> $(DISK_SCRIPT)
 
 	# byee~
 	printf "exit\n" >> $(DISK_SCRIPT)
 
-$(DISK): $(BIN) $(DISK_SCRIPT)
+$(DISK): $(BIN) $(MESSAGE) $(DISK_SCRIPT)
 	openmsx -script $(DISK_SCRIPT)
 
 test: dirs $(DISK) $(TEST_SCRIPT)
