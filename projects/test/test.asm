@@ -21,7 +21,38 @@ banksize TOTAL_SIZE
 banks 1
 .endro
 
+; BDOS
+
+.define BDOS $f37d
+.define CONOUT $02
+.define STROUT $09
+
 entry:
+    ; Write out messages (syscall test)
+    ld de, message1
+    ld c, STROUT
+    call BDOS
+
+    ld hl, message2
+message_2_char_loop:
+        ld a, (hl)
+        or a
+        jr z, message_2_char_loop_end
+
+        push hl
+        push af
+
+        ld e, a
+        ld c, CONOUT
+        call BDOS
+
+        pop af
+        pop hl
+
+        inc hl
+    jr message_2_char_loop
+message_2_char_loop_end:
+
     ; Disable interrupts (otherwise our VDP I/O could get screwed due to internal index flip flops)
     di
 
@@ -46,6 +77,14 @@ main_loop:
     inc (hl)
 
     jr main_loop
+
+message1:
+    .asc "hi gotaku birade ruls mmk"
+    .db $13, $10
+    .asc "$"
+message2:
+    .asc "hi its me again fam"
+    .db $00
 
 color_value:
     .db $00
