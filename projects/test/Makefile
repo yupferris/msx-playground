@@ -15,7 +15,7 @@ DISK=$(BUILD_DIR)/$(PROJECT).dsk
 
 TEST_SCRIPT=../../scripts/test.tcl
 
-MACHINE=sony_hb-f1xd
+MACHINE=Sony_HB-F1XD
 
 MAKEFILE=Makefile
 
