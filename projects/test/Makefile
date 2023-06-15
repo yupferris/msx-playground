@@ -45,7 +45,7 @@ $(MESSAGE): $(MAKEFILE)
 
 $(DISK_SCRIPT): $(MAKEFILE)
 	# create disk
-	printf "diskmanipulator create $(DISK) 360k\n" > $(DISK_SCRIPT)
+	printf "diskmanipulator create $(DISK) 360k -dos1\n" > $(DISK_SCRIPT)
 
 	# load disk
 	printf "virtual_drive $(DISK)\n" >> $(DISK_SCRIPT)
